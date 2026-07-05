@@ -1,0 +1,268 @@
+{
+  "info": {
+    "name": "VetCare API",
+    "description": "Colección de pruebas para el sistema de gestión de veterinaria VetCare (Django REST Framework + JWT).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api" },
+    { "key": "access_token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (obtener token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = pm.response.json();",
+                  "if (data.access) { pm.collectionVariables.set('access_token', data.access); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin1234\"\n}" },
+            "url": "{{base_url}}/auth/login/"
+          }
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"refresh\": \"<refresh_token>\"\n}" },
+            "url": "{{base_url}}/auth/refresh/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Doctores",
+      "item": [
+        { "name": "Listar veterinarios", "request": { "method": "GET", "url": "{{base_url}}/veterinarios/" } },
+        {
+          "name": "Registrar veterinario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombres\": \"Ana\",\n  \"apellidos\": \"Torres\",\n  \"especialidad\": \"Dermatología\",\n  \"telefono\": \"999888777\",\n  \"email\": \"ana.torres@vetcare.com\"\n}" },
+            "url": "{{base_url}}/veterinarios/"
+          }
+        },
+        {
+          "name": "Actualizar veterinario",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"telefono\": \"999000111\"\n}" },
+            "url": "{{base_url}}/veterinarios/1/"
+          }
+        },
+        { "name": "Eliminar veterinario", "request": { "method": "DELETE", "url": "{{base_url}}/veterinarios/1/" } },
+        { "name": "Resumen doctores (citas/consultas)", "request": { "method": "GET", "url": "{{base_url}}/veterinarios/resumen/" } },
+        { "name": "Citas de hoy por doctor", "request": { "method": "GET", "url": "{{base_url}}/veterinarios/citas-hoy/" } }
+      ]
+    },
+    {
+      "name": "Clientes y Mascotas",
+      "item": [
+        { "name": "Listar clientes", "request": { "method": "GET", "url": "{{base_url}}/clientes/" } },
+        {
+          "name": "Registrar cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombres\": \"Juan\",\n  \"apellidos\": \"Pérez\",\n  \"tipo_documento\": \"DNI\",\n  \"num_documento\": \"71234567\",\n  \"telefono\": \"988888888\",\n  \"email\": \"juan@example.com\",\n  \"direccion\": \"Lima\"\n}" },
+            "url": "{{base_url}}/clientes/"
+          }
+        },
+        { "name": "Listar mascotas", "request": { "method": "GET", "url": "{{base_url}}/mascotas/" } },
+        {
+          "name": "Registrar mascota",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"cliente\": 1,\n  \"nombre\": \"Firulais\",\n  \"especie\": \"Perro\",\n  \"raza\": \"Poodle\",\n  \"sexo\": \"M\",\n  \"fecha_nacimiento\": \"2022-01-15\"\n}" },
+            "url": "{{base_url}}/mascotas/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inventario (Petshop + Medicamentos)",
+      "item": [
+        { "name": "Listar categorías", "request": { "method": "GET", "url": "{{base_url}}/categorias/" } },
+        {
+          "name": "Registrar categoría",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Antiparasitarios\",\n  \"tipo\": \"medicamento\",\n  \"descripcion\": \"Productos antiparasitarios\"\n}" },
+            "url": "{{base_url}}/categorias/"
+          }
+        },
+        { "name": "Listar productos (todos)", "request": { "method": "GET", "url": "{{base_url}}/productos/" } },
+        { "name": "Listar productos - petshop", "request": { "method": "GET", "url": "{{base_url}}/productos/?tipo=petshop" } },
+        { "name": "Listar productos - medicamentos", "request": { "method": "GET", "url": "{{base_url}}/productos/?tipo=medicamento" } },
+        {
+          "name": "Registrar producto",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"categoria\": 1,\n  \"nombre\": \"Shampoo antipulgas\",\n  \"tipo\": \"petshop\",\n  \"descripcion\": \"Shampoo medicado\",\n  \"precio\": 35.50,\n  \"stock\": 20,\n  \"stock_minimo\": 5\n}" },
+            "url": "{{base_url}}/productos/"
+          }
+        },
+        {
+          "name": "Actualizar stock de producto",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"stock\": 18\n}" },
+            "url": "{{base_url}}/productos/1/"
+          }
+        },
+        { "name": "Eliminar producto", "request": { "method": "DELETE", "url": "{{base_url}}/productos/1/" } }
+      ]
+    },
+    {
+      "name": "Módulo 1 - Facturación",
+      "item": [
+        { "name": "Listar facturas", "request": { "method": "GET", "url": "{{base_url}}/facturas/" } },
+        {
+          "name": "Registrar factura",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"cliente\": 1,\n  \"tipo_documento\": \"boleta\",\n  \"serie\": \"B001\",\n  \"numero\": \"000002\",\n  \"subtotal\": 100,\n  \"igv\": 18,\n  \"total\": 118,\n  \"estado\": \"pendiente\",\n  \"detalles\": [\n    { \"descripcion\": \"Consulta veterinaria\", \"cantidad\": 1, \"precio_unitario\": 100, \"subtotal\": 100 }\n  ]\n}" },
+            "url": "{{base_url}}/facturas/"
+          }
+        },
+        {
+          "name": "Actualizar estado de factura (pendiente -> pagada)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"estado\": \"pagada\"\n}" },
+            "url": "{{base_url}}/facturas/1/estado/"
+          }
+        },
+        {
+          "name": "Anular factura",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"estado\": \"anulada\"\n}" },
+            "url": "{{base_url}}/facturas/1/estado/"
+          }
+        },
+        { "name": "Reporte: facturas del día", "request": { "method": "GET", "url": "{{base_url}}/reportes/facturas/dia/" } },
+        { "name": "Reporte: ingresos por mes", "request": { "method": "GET", "url": "{{base_url}}/reportes/facturas/ingresos-mes/" } },
+        { "name": "Reporte: facturas por cliente", "request": { "method": "GET", "url": "{{base_url}}/reportes/facturas/por-cliente/1/" } },
+        { "name": "Reporte: facturas anuladas", "request": { "method": "GET", "url": "{{base_url}}/reportes/facturas/anuladas/" } }
+      ]
+    },
+    {
+      "name": "Módulo 2 - Historial Clínico",
+      "item": [
+        { "name": "Listar consultas", "request": { "method": "GET", "url": "{{base_url}}/consultas/" } },
+        {
+          "name": "Registrar consulta",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mascota\": 1,\n  \"veterinario\": 1,\n  \"motivo_consulta\": \"Vómitos\",\n  \"diagnostico\": \"Gastritis leve\",\n  \"tratamiento\": \"Dieta blanda + protector gástrico\",\n  \"observaciones\": \"Revisar en 5 días\"\n}" },
+            "url": "{{base_url}}/consultas/"
+          }
+        },
+        {
+          "name": "Actualizar diagnóstico",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"diagnostico\": \"Gastritis moderada\"\n}" },
+            "url": "{{base_url}}/consultas/1/"
+          }
+        },
+        { "name": "Listar recetas", "request": { "method": "GET", "url": "{{base_url}}/recetas/" } },
+        {
+          "name": "Registrar receta",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"consulta\": 1,\n  \"medicamento\": 3,\n  \"dosis\": \"1 tableta\",\n  \"frecuencia\": \"Cada 12 horas\",\n  \"duracion\": \"7 días\",\n  \"indicaciones\": \"Dar con alimento\"\n}" },
+            "url": "{{base_url}}/recetas/"
+          }
+        },
+        { "name": "Listar vacunas", "request": { "method": "GET", "url": "{{base_url}}/vacunas/" } },
+        {
+          "name": "Registrar vacuna",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mascota\": 1,\n  \"veterinario\": 2,\n  \"nombre_vacuna\": \"Parvovirus\",\n  \"fecha_aplicacion\": \"2026-07-01\",\n  \"fecha_proxima\": \"2027-07-01\"\n}" },
+            "url": "{{base_url}}/vacunas/"
+          }
+        },
+        { "name": "Reporte: consultas por mascota", "request": { "method": "GET", "url": "{{base_url}}/reportes/consultas/por-mascota/1/" } },
+        { "name": "Reporte: vacunas próximas a vencer", "request": { "method": "GET", "url": "{{base_url}}/reportes/vacunas/proximas-vencer/?dias=30" } },
+        { "name": "Reporte: diagnósticos más frecuentes", "request": { "method": "GET", "url": "{{base_url}}/reportes/consultas/diagnosticos-frecuentes/" } },
+        { "name": "Reporte: consultas por veterinario", "request": { "method": "GET", "url": "{{base_url}}/reportes/consultas/por-veterinario/1/" } }
+      ]
+    },
+    {
+      "name": "Módulo 3 - Citas",
+      "item": [
+        { "name": "Listar citas", "request": { "method": "GET", "url": "{{base_url}}/citas/" } },
+        {
+          "name": "Registrar cita",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mascota\": 1,\n  \"veterinario\": 1,\n  \"fecha\": \"2026-07-10\",\n  \"hora\": \"09:30\",\n  \"motivo\": \"Vacunación\"\n}" },
+            "url": "{{base_url}}/citas/"
+          }
+        },
+        {
+          "name": "Actualizar estado de cita",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"estado\": \"confirmada\"\n}" },
+            "url": "{{base_url}}/citas/1/estado/"
+          }
+        },
+        {
+          "name": "Cancelar cita",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"estado\": \"cancelada\"\n}" },
+            "url": "{{base_url}}/citas/1/estado/"
+          }
+        },
+        { "name": "Reporte: citas del día", "request": { "method": "GET", "url": "{{base_url}}/reportes/citas/dia/" } },
+        { "name": "Reporte: citas por veterinario", "request": { "method": "GET", "url": "{{base_url}}/reportes/citas/por-veterinario/1/" } },
+        { "name": "Reporte: citas canceladas", "request": { "method": "GET", "url": "{{base_url}}/reportes/citas/canceladas/" } },
+        { "name": "Reporte: citas pendientes por mascota", "request": { "method": "GET", "url": "{{base_url}}/reportes/citas/pendientes-por-mascota/1/" } }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        { "name": "Resumen general", "request": { "method": "GET", "url": "{{base_url}}/dashboard/resumen/" } }
+      ]
+    }
+  ]
+}
